@@ -20,27 +20,26 @@ public class Location {
      * concatenation of the row and the column. 
      * 
      * This is because if the row and column are the same, we want the same hashCode, 
-     * and by default the memory address is hashed. This isn't the behavior we want. By default, 
-     * locations will ALWAYS be considered different because they are stored in differnt spots in memory
-     * unless they share a reference. 
+     * and by default the reference is hashed. This isn't the behavior we want. By default,
+     * locations will ALWAYS be considered different unless the reference is the same.
      * 
      * Example: 
-     * Location l1 = new Location(0, 1); // stored at 0x00
-     * Location l2 = new Location(0, 1); // stored at 0x01
+     * Location l1 = new Location(0, 1); // refers to object stored at 0x00
+     * Location l2 = new Location(0, 1); // refers to object stored at 0x01
      *          ^
      *          |
-     * These identical locaitons will have two different hashes since the reference Java stores is
+     * These identical locations will have two different hashes since the reference Java stores is
      * different.
      * 
      * With this implementation of hashCode, two different Locations won't get the same hashCode since the string 
-     * will surely by different, granted that Java's hashing algorithm is robust enough to 
-     * avoid collisions. 
+     * will surely be different, granted that Java's hashing algorithm is robust enough to
+     * avoid collisions. Two identical locations would have the same string, and therefore have the same hash.
      */
     public int hashCode() {
         return (Integer.toString(row) + Integer.toString(column)).hashCode();
     }
 
-    // returns true if both objects are Locations and they represent the same spot on the board 
+    // returns true if both objects are Locations, and they represent the same spot on the board
     @Override
     public boolean equals(Object o) {
         if (null == o || !(o instanceof Location)) { return false; }

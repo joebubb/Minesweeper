@@ -51,6 +51,8 @@ public class Minesweeper {
     }
     
     private Boolean locationIsValid(Location location) {
+        if (null == location) { return false; }
+
         int row = location.getRow(); 
         int column = location.getColumn(); 
 
@@ -65,21 +67,75 @@ public class Minesweeper {
         return true; 
     }
 
-    public void makeSelection(Location location) throws MinesweeperException {
-        if (selectedLocations.contains(location)) {
-            throw new MinesweeperException("That spot has already been selected."); 
-        } else if (!locationIsValid(location)) {
-            throw new MinesweeperException("That spot does not exist."); 
-        } else {
-            selectedLocations.add(location); 
+    private Collection<Location> getPossibleSelections() {
+        List<Location> result = new ArrayList<Location>();
+        // get all non-selected spots
+        for (int row = 0; row < board.length; row++) {
+            for (int column = 0; column < board[0].length; column++) {
+                Location l = new Location(row, column);
+                if (!(selectedLocations.contains(l))) {
+                    result.add(l);
+                }
+            }
         }
-    }
-    
-    public GameState getGameState() {
-        return state; 
+        return result;
     }
 
-    public int getMoveCount() {
-        return moveCount; 
+    public void makeSelection(Location location) throws MinesweeperException {
+        if (!getPossibleSelections().contains(location)) {
+            throw new MinesweeperException("That selection is invalid.");
+        } else {
+            selectedLocations.add(location);
+            moveCount++;
+            // start the game if it hasn't started yet
+            if (state == GameState.NOT_STARTED) { state = GameState.IN_PROGRESS; }
+
+            //
+            int row = location.getRow();
+            int column = location.getColumn();
+            Spot selectedSpot = board[row][column];
+
+            if (selectedSpot == Spot.Mine) {
+                state = GameState.LOST;
+            } else { // spot is safe
+
+            }
+        }
+    }
+
+    public int minesAroundSpot(Location l) {
+        int row = l.getRow();
+        int column = l.getColumn();
+        int mines = 0;
+
+        for (int r2 = row - 1; r2 <= row + 1; r2++) {
+            for (int c2 = column - 1; c2 <= column + 1; c2++) {
+                Location tmp = new Location(r2, c2);
+                if (locationIsValid(tmp) && tmp != l) {
+                    if (board[r2][c2] == Spot.Mine) {
+                        mines++;
+                    }
+                }
+            }
+        }
+        return mines;
+    }
+    
+    public GameState getGameState() { return state; }
+    public int getMoveCount() { return moveCount; }
+
+    @Override
+    public String toString() {
+        String result = "";
+
+        for (int row = 0; row < board.length; row++) {
+            for (int column = 0; column < board[0].length; column++) {
+                Location l = new Location(row, column);
+
+            }
+            result += "\n";
+        }
+
+        return result;
     }
 }

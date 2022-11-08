@@ -10,6 +10,7 @@ public class Minesweeper {
     private final char MINE = 'M'; 
     private final char COVERED = '-'; 
     private Set<Location> selectedLocations; 
+    private Set<Location> flaggedLocations; 
     private GameState state; 
     private int moveCount; 
 
@@ -44,6 +45,7 @@ public class Minesweeper {
         state = GameState.NOT_STARTED; 
         moveCount = 0; 
         selectedLocations = new HashSet<Location>();
+        flaggedLocations = new HashSet<Location>(); 
     }  
 
     public static void main(String[] args) {
@@ -131,7 +133,14 @@ public class Minesweeper {
         for (int row = 0; row < board.length; row++) {
             for (int column = 0; column < board[0].length; column++) {
                 Location l = new Location(row, column);
-
+                if (selectedLocations.contains(l)) {
+                    if (board[row][column] == Spot.Mine) {
+                        result += MINE + " "; 
+                    }
+                }
+                else {
+                    result += COVERED + " "; 
+                }
             }
             result += "\n";
         }

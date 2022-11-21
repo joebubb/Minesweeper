@@ -75,7 +75,7 @@ public class Minesweeper {
      * Notifies the observer of the change in the game
      * @param location the location that was clicked
      */
-    private final void notifyObserver(Location location) {
+    private final void notifyObserver(Location location) throws MinesweeperException {
         if (observer != null) {
             observer.cellUpdated(location);
         }
@@ -197,7 +197,7 @@ public class Minesweeper {
     /**
      * Reveals the board to the user after the game is won or lost.
      */
-    public void revealBoard() {
+    public void revealBoard() throws MinesweeperException {
         for (int row = 0; row < board.length; row++) {
             for (int column = 0; column < board[0].length; column++) {
                 Location l = new Location(row, column);

@@ -1,6 +1,8 @@
 package view;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -100,8 +102,17 @@ public class MinesweeperGUI extends Application{
         MinesweeperObserver changer = new MinesweeperObserverImp(this);
         minesweeper.register(changer);
 
-        MinesweeperMoveMaker moveMaker = new MinesweeperMoveMaker(this, location);
-        button.setOnAction(moveMaker);
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    minesweeper.makeSelection(location);
+                } catch (MinesweeperException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
 
         return button;
     }

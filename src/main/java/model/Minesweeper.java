@@ -61,6 +61,7 @@ public class Minesweeper {
         state = GameState.NOT_STARTED; 
         moveCount = 0; 
         selectedLocations = new HashSet<Location>();
+        observer = null;
     }  
     
     /**
@@ -75,7 +76,9 @@ public class Minesweeper {
      * @param location the location that was clicked
      */
     private final void notifyObserver(Location location) {
-        observer.cellUpdated(location);
+        if (observer != null) {
+            observer.cellUpdated(location);
+        }
     }
 
     /**

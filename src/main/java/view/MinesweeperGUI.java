@@ -16,10 +16,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-import model.GameState;
-import model.Location;
-import model.Minesweeper;
-import model.MinesweeperException;
+import model.*;
 
 public class MinesweeperGUI extends Application{
 
@@ -100,7 +97,7 @@ public class MinesweeperGUI extends Application{
         Location location = new Location(row, col);
         updateCell(location);
 
-        MinesweeperChanger changer = new MinesweeperChanger(this);
+        MinesweeperObserver changer = new MinesweeperObserverImp(this);
         minesweeper.register(changer);
 
         MinesweeperMoveMaker moveMaker = new MinesweeperMoveMaker(this, location);

@@ -1,4 +1,4 @@
-package minesweeper.view;
+package view;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -30,7 +30,7 @@ public class MinesweeperGUI extends Application{
     private final int maxCellsSize = 600;
     private final int mineCount = 50;
     private Minesweeper minesweeper;
-    private Label statusLable;
+    private Label statusLabel;
     private Label minesVal;
     private Label movesVal;
 
@@ -59,7 +59,8 @@ public class MinesweeperGUI extends Application{
         Button solve = makeButton("Solve");
         Button reset = makeButton("Reset");
         Button quit = makeButton("Quit");
-        hint.setOnAction(e -> {try {getHint();} catch (MinesweeperException me) {statusLable.setText(STATUS + me.getMessage());}});
+        hint.setOnAction(e -> {try {getHint();} catch (MinesweeperException me) {
+            statusLabel.setText(STATUS + me.getMessage());}});
         solve.setOnAction(e -> solve());
         reset.setOnAction(e -> {try {start(stage);} catch (MinesweeperException me) {} catch (Exception e1) {}});
         quit.setOnAction(e -> stage.close());
@@ -76,10 +77,10 @@ public class MinesweeperGUI extends Application{
 
         // bottom pane
         GridPane bottom = new GridPane();
-        statusLable = makeLabel(STATUS + "None!", 14, Color.BLACK, Color.LIGHTYELLOW, 710);
-        statusLable.setAlignment(Pos.CENTER_LEFT);
-        statusLable.setPadding(new Insets(5));
-        bottom.add(statusLable, 1, 0);
+        statusLabel = makeLabel(STATUS + "None!", 14, Color.BLACK, Color.LIGHTYELLOW, 710);
+        statusLabel.setAlignment(Pos.CENTER_LEFT);
+        statusLabel.setPadding(new Insets(5));
+        bottom.add(statusLabel, 1, 0);
         pane.setBottom(bottom);
 
         // initialization
@@ -89,14 +90,14 @@ public class MinesweeperGUI extends Application{
         stage.show();
     }
 
-    private Button makeCellButton(int col, int row){
+    private Button makeCellButton(int col, int row) throws MinesweeperException {
         Button button = new Button();
         int cellSize = maxCellsSize/rows;
         button.setMinSize(cellSize, cellSize);
         button.setPadding(Insets.EMPTY);
         buttons[row][col] = button;
 
-        Location location = minesweeper.getBoard()[row][col];
+        Location location = new Location(row, col);
         updateCell(location);
 
         MinesweeperChanger changer = new MinesweeperChanger(this);
@@ -127,20 +128,20 @@ public class MinesweeperGUI extends Application{
     }
 
     private void getHint() throws MinesweeperException{
-        Location hint = minesweeper.getHint();
-        statusLable.setText(STATUS + "Give " + hint + " a try.");
+        Location hint = minesweeper.giveHint();
+        statusLabel.setText(STATUS + "Give " + hint + " a try.");
         this.buttons[hint.getRow()][hint.getCol()].setStyle("-fx-background-color: #94ffb0; -fx-border-color: d4d4d4; "); 
     }
 
-    public void updateCell(Location location){
-        if(!location.isCovered()){
-            if(location.getPiece() == Artifact.MINE){
+    public void updateCell(Location location) throws MinesweeperException {
+        if(!minesweeper.isCovered(location)){
+            if(minesweeper.getSymbol(location) == 'M'){
                 buttons[location.getRow()][location.getCol()].setStyle("-fx-background-image: url('media/images/mine24.png'); -fx-background-repeat: no-repeat; -fx-background-size: cover; -fx-border-color: #d4d4d4; ");
-            }else if(location.getPiece() == Artifact.BLANK){
+            }else if(minesweeper.minesAroundSpot(location) == 0){
                 buttons[location.getRow()][location.getCol()].setStyle("-fx-background-color: #808080; -fx-border-color: #d4d4d4; ");
             }else{
                 buttons[location.getRow()][location.getCol()].setStyle("-fx-background-color: #808080; -fx-border-color: #d4d4d4; ");
-                String string = Character.toString(location.getPiece().getSymbol());
+                String string = Character.toString(minesweeper.getSymbol(location));
                 buttons[location.getRow()][location.getCol()].setText(string);
                 buttons[location.getRow()][location.getCol()].setFont(Font.font("Arial", FontWeight.BOLD, 20));
                 switch(string){
@@ -175,25 +176,25 @@ public class MinesweeperGUI extends Application{
 
     public void makeMove(Location location){
         try{
-            minesweeper.makeSelection(location.getRow(), location.getCol());
+            minesweeper.makeSelection(location);
             movesVal.setText(String.valueOf(minesweeper.getMoveCount()));
             if(minesweeper.getGameState() == GameState.LOST){
-                statusLable.setText(STATUS + "BOOM! Better luck next time!");
-                statusLable.setBackground(new Background(new BackgroundFill(Color.rgb(255, 138, 138, 1.0), new CornerRadii(0), Insets.EMPTY)));
+                statusLabel.setText(STATUS + "BOOM! Better luck next time!");
+                statusLabel.setBackground(new Background(new BackgroundFill(Color.rgb(255, 138, 138, 1.0), new CornerRadii(0), Insets.EMPTY)));
             }else if(minesweeper.getGameState() == GameState.WON){
-                statusLable.setText(STATUS + "Congratulations! You won!");
-                statusLable.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, new CornerRadii(0), Insets.EMPTY)));
+                statusLabel.setText(STATUS + "Congratulations! You won!");
+                statusLabel.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, new CornerRadii(0), Insets.EMPTY)));
             }
         }catch(MinesweeperException me){
-            statusLable.setText(STATUS + me.getMessage());
+            statusLabel.setText(STATUS + me.getMessage());
         }
     }
 
     private void solve(){
         while(this.minesweeper.getGameState() == GameState.IN_PROGRESS){
             try {
-                Location location = this.minesweeper.getHint();
-                this.statusLable.setText("Selection: "  + location);
+                Location location = this.minesweeper.giveHint();
+                this.statusLabel.setText("Selection: "  + location);
                 makeMove(location);
             } catch (MinesweeperException e) {
                 // squash
